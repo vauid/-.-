@@ -36,8 +36,25 @@ body {
     transition: background-color 0.3s, color 0.3s;
     letter-spacing: 0.02em; 
     -webkit-font-smoothing: antialiased;
+    /* 新增：背景图设置 */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; /* 背景固定，不随滚动条滚动 */
+    background-repeat: no-repeat;
+    min-height: 100vh;
 }
-
+/* 新增：背景遮罩层 (确保壁纸太亮时文字依然清晰) */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    background: rgba(18, 18, 18, 0.65); /* 深色半透明遮罩 */
+    z-index: -1; /* 放在内容之下 */
+    pointer-events: none; /* 不阻挡点击 */
+}
 .container { max-width: 1200px; margin: 0 auto; }
 
 /* 标题排版优化 - 紧凑型 */
@@ -1962,6 +1979,11 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
                <div class="dashboard-panel">
                   <h3>数据维护</h3>
                   <div class="toolbox-buttons-grid" style="grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <button id="btn-change-wallpaper" class="tool-btn">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        更换壁纸
+                    </button>
+                    <input type="file" id="wallpaper-input" accept="image/*" style="display: none;">
                       <button id="btn-export-all" class="tool-btn">
                           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                            导出备份
@@ -2987,7 +3009,36 @@ async function updateDashboard() {
             }
         }
     }
+// --- 壁纸逻辑 ---
+function applyWallpaper(fileBlob) {
+        if (!fileBlob) return;
+        try {
+            // 如果之前有旧的 URL，释放它以节省内存
+            const oldUrl = document.body.style.backgroundImage.slice(5, -2);
+            if (oldUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(oldUrl);
+            }
+            
+            const url = URL.createObjectURL(fileBlob);
+            document.body.style.backgroundImage = `url('${url}')`;
+        } catch (e) {
+            console.error("应用壁纸失败:", e);
+        }
+    }
 
+    async function handleWallpaperChange(file) {
+        if (!file) return;
+        // 1. 应用壁纸
+        applyWallpaper(file);
+        // 2. 保存到数据库 (appdata 表)
+        try {
+            await setAppData({ key: 'custom_wallpaper', value: file });
+            alert("壁纸设置成功！");
+        } catch (e) {
+            console.error("保存壁纸失败:", e);
+            alert("壁纸应用成功，但保存失败（可能是图片太大）。");
+        }
+    }
     // --- 批量操作：移动 ---
     function openBatchMoveModal() {
         if (selectedBatchIds.size === 0) {
@@ -4095,6 +4146,24 @@ async function changeShowcaseFolder(folderName) {
         });
     }
     function setupEventListeners() {
+        // ===== 修复：添加壁纸按钮的点击事件 =====
+        const btnChangeWallpaper = document.getElementById('btn-change-wallpaper');
+        const wallpaperInput = document.getElementById('wallpaper-input');
+        
+        if (btnChangeWallpaper && wallpaperInput) {
+            // 点击按钮 -> 触发文件选择框
+            btnChangeWallpaper.addEventListener('click', () => wallpaperInput.click());
+            
+            // 选完文件 -> 执行更换逻辑
+            wallpaperInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if(file) {
+                    handleWallpaperChange(file);
+                }
+                // 清空 input，防止选中同一张图不触发 change 事件
+                e.target.value = ''; 
+            });
+        }
         // 视图切换
         document.getElementById('btn-toggle-view').addEventListener('click', () => {
             currentViewMode = currentViewMode === 'stack' ? 'list' : 'stack';
@@ -4384,7 +4453,15 @@ async function changeShowcaseFolder(folderName) {
                 currentShowcaseFolder = savedShowcase.value;
             }
         }
-
+// ===== 新增：启动时加载壁纸 =====
+try {
+                const savedWP = await getAppData('custom_wallpaper');
+                if (savedWP && savedWP.value) {
+                    applyWallpaper(savedWP.value);
+                }
+            } catch (e) {
+                console.warn("加载壁纸失败", e);
+            }
         if (!currentFolder) currentFolder = '默认文件夹';
         await renderAllCharacterCards();
         setupEventListeners();
