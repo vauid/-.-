@@ -1973,7 +1973,7 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
                       <!-- 新增的 GitHub 备份按钮 -->
                       <button id="btn-backup-github" class="tool-btn">
                           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-                          云端备份
+                          Github
                      </button>
                      <button id="btn-clear-all" class="tool-btn btn-danger-full">
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
@@ -2281,45 +2281,49 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
     </div>
 
      <!-- ===== GitHub 备份弹窗 (修复版) ===== -->
- <div class="modal-overlay" id="github-backup-modal">
-     <div class="modal-content">
-         <div class="modal-header">
-             <h3>备份到 GitHub</h3>
-         </div>
-         
-         <div class="modal-body">
-             <p style="font-size: 0.85em; color: var(--text-secondary-color); margin-bottom: 20px; line-height: 1.5;">
-                 数据将打包上传至您的私有仓库。
-                 <a href="https://github.com/settings/tokens/new?scopes=repo&description=CharacterCardBackup" target="_blank" style="color: var(--info-color); text-decoration: none; border-bottom: 1px dashed var(--info-color);">点此生成访问令牌 (PAT)</a>，只需勾选 <code>repo</code> 权限。
-             </p>
-         
-             <!-- 表单组 1: 用户名 -->
-             <div class="github-form-group">
-                 <label for="github-username" class="github-form-label">GitHub 用户名</label>
-                 <input type="text" id="github-username" class="github-form-input" placeholder="例如：octocat">
-             </div>
-
-             <!-- 表单组 2: 仓库名 -->
-             <div class="github-form-group">
-                 <label for="github-repo" class="github-form-label">仓库名称 (私有)</label>
-                 <input type="text" id="github-repo" class="github-form-input" placeholder="例如：my-card-backup">
-             </div>
-
-             <!-- 表单组 3: Token -->
-             <div class="github-form-group">
-                 <label for="github-token" class="github-form-label">个人访问令牌 (PAT)</label>
-                 <input type="password" id="github-token" class="github-form-input" placeholder="粘贴以 ghp_ 开头的令牌">
-             </div>
-         
-             <p id="github-status-message" style="text-align: center; margin-top: 10px; font-size: 0.85em; color: var(--warning-color); min-height: 20px;"></p>
-         </div>
-
-         <div class="modal-footer">
-             <button id="btn-cancel-github-backup">取消</button>
-             <button id="btn-confirm-github-backup">确认备份</button>
-        </div>
-    </div>
-</div>
+     <div class="modal-overlay" id="github-backup-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>连接到 GitHub</h3>
+            </div>
+            
+            <div class="modal-body">
+                <p style="font-size: 0.85em; color: var(--text-secondary-color); margin-bottom: 15px; line-height: 1.5;">
+                    配置仓库信息以启用云端同步。
+                    <a href="https://github.com/settings/tokens/new?scopes=repo&description=CharacterCardBackup" target="_blank" style="color: var(--info-color); text-decoration: none; border-bottom: 1px dashed var(--info-color);">获取 Token (仅需 repo 权限)</a>
+                </p>
+            
+                <div class="github-form-group">
+                    <label for="github-username" class="github-form-label">GitHub 用户名</label>
+                    <input type="text" id="github-username" class="github-form-input" placeholder="例如：octocat">
+                </div>
+   
+                <div class="github-form-group">
+                    <label for="github-repo" class="github-form-label">仓库名称 (私有)</label>
+                    <input type="text" id="github-repo" class="github-form-input" placeholder="例如：my-card-backup">
+                </div>
+   
+                <div class="github-form-group">
+                    <label for="github-token" class="github-form-label">个人访问令牌 (PAT)</label>
+                    <input type="password" id="github-token" class="github-form-input" placeholder="粘贴以 ghp_ 开头的令牌">
+                </div>
+            
+                <p id="github-status-message" style="text-align: center; margin-top: 10px; font-size: 0.85em; color: var(--warning-color); min-height: 20px; white-space: pre-wrap;"></p>
+            </div>
+   
+            <div class="modal-footer" style="flex-direction: column !important; gap: 10px !important;">
+                <div style="display: flex; gap: 10px; width: 100%;">
+                    <button id="btn-github-restore" style="flex: 1; background: rgba(100, 181, 246, 0.15) !important; color: #64b5f6 !important; border: 1px solid rgba(100, 181, 246, 0.3) !important;">
+                        <span style="margin-right:5px">⬇️</span> 恢复云端数据
+                    </button>
+                    <button id="btn-github-upload" style="flex: 1; background: linear-gradient(135deg, #66bb6a, #43a047) !important; color: white !important; border: none !important;">
+                        <span style="margin-right:5px">⬆️</span> 上传备份
+                    </button>
+                </div>
+                <button id="btn-github-close" style="width: 100%; background: transparent !important; border: none !important; color: var(--text-secondary-color) !important; padding: 8px !important;">关闭窗口</button>
+           </div>
+       </div>
+   </div>
 <div id="batch-action-bar">
     <div class="batch-count-badge">已选: <span id="batch-selected-count">0</span></div>
     
@@ -2509,8 +2513,8 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
     // 4. 核心业务逻辑 (全局作用域)
     // ==========================================
     
-    // --- 仪表盘更新逻辑 (支持自定义文件夹) ---
-    async function updateDashboard() {
+// --- 仪表盘更新逻辑 (支持自定义文件夹) ---
+async function updateDashboard() {
          if (!db) return;
 
          const favContainer = document.getElementById('fav-showcase-container');
@@ -2519,12 +2523,8 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
 
          // 1. 更新标题文字
          if (titleEl) {
-             // 根据文件夹名字给个不同的 emoji (可选)
-             let icon = '📂';
-             if (currentShowcaseFolder === '我的最爱') icon = '🤍';
-             else if (currentShowcaseFolder === '回收站') icon = '🗑️';
-         
-             titleEl.innerHTML = `${icon} ${currentShowcaseFolder} <span style="font-size:0.7em; opacity:0.5;">▼</span>`;
+             // 修改：移除了自动 Emoji 装饰逻辑，只显示文件夹名称
+             titleEl.innerHTML = `${currentShowcaseFolder} <span style="font-size:0.7em; opacity:0.5;">▼</span>`;
          }
 
          if (favContainer) favContainer.innerHTML = '<div class="loading-placeholder"></div>';
@@ -3541,10 +3541,10 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
             const zip = await JSZip.loadAsync(file);
             let charCount = 0;
             let attachmentCount = 0;
-            const folderToCharIdMap = new Map();
+            const folderToCharIdMap = new Map(); // 用于映射 ZIP 里的文件夹路径到 角色ID
             let commentsBackup = {};
 
-            // 先读取批注备份文件
+            // 1. 先读取批注备份文件
             const commentsFile = Object.values(zip.files).find(f => f.name.endsWith('all_comments_backup.json'));
             if (commentsFile) {
                 try {
@@ -3555,17 +3555,19 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
                 }
             }
 
+            // 2. 第一遍遍历：处理角色卡 (PNG/JSON)
             for (const [relativePath, zipEntry] of Object.entries(zip.files)) {
                 if (zipEntry.dir || relativePath.includes('__MACOSX') || relativePath.includes('.DS_Store')) continue;
                 
                 // 跳过批注备份文件本身
                 if (zipEntry.name.endsWith('all_comments_backup.json')) continue;
 
+                // 判断是否为角色文件 (不在附件文件夹内，且后缀正确)
                 if (!relativePath.includes('/附件/') && (relativePath.match(/\.(png|json|webp|jpeg|jpg)$/i))) {
                     const blob = await zipEntry.async('blob');
                     const fileName = zipEntry.name.split('/').pop();
                     
-                    // 显式指定 MIME 类型，因为 JSZip 可能无法自动推断，或者 blob.type 为空
+                    // 显式指定 MIME 类型
                     let mimeType = blob.type;
                     if (!mimeType) {
                         if (fileName.endsWith('.png')) mimeType = 'image/png';
@@ -3576,32 +3578,24 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
 
                     const fileObj = new File([blob], fileName, { type: mimeType });
                     
-                    // 保存角色
-                    // 导入时，强制使用文件名作为角色名，避免重复导入时被覆盖或无法识别
-                    // 同时，导入时应该允许覆盖或重命名，但这里为了简化，我们先假设是新导入
-                    // 注意：saveNewCharacter 内部会处理重名（虽然目前逻辑是直接添加，可能会有重复）
-                    // 关键修复：确保 fileObj 的 type 正确，否则 saveNewCharacter 可能会失败
+                    // ===== 核心修改开始：检查是否存在 =====
+                    const existingChar = await findCharacterByFileName(fileName);
+                    let targetCharId;
+
+                    if (existingChar) {
+                        // 1. 如果存在：覆盖更新
+                        console.log(`检测到已存在角色: ${fileName}，正在覆盖...`);
+                        await overwriteCharacter(fileObj, existingChar);
+                        targetCharId = existingChar.id; // 复用旧 ID
+                    } else {
+                        // 2. 如果不存在：新建
+                        console.log(`导入新角色: ${fileName}`);
+                        targetCharId = await saveNewCharacter(fileObj);
+                    }
+                    // ===== 核心修改结束 =====
                     
-                    // 尝试从路径中提取文件夹名
-                    const pathParts = relativePath.split('/');
-                    // 假设结构是 根目录/角色名/角色卡.png
-                    // pathParts 可能是 ['角色卡备份', '角色名', '角色卡.png']
-                    // 我们需要 '角色名' 作为文件夹名（如果它是一个文件夹的话）
-                    // 但目前的逻辑是把所有导入的角色都放到 currentFolder
-                    
-                    // 临时切换 currentFolder 为导入的角色所在的文件夹名（如果是按文件夹结构备份的）
-                    // 备份结构：根目录/角色名/角色卡文件
-                    // 所以倒数第二个部分可能是角色名，但这通常不是我们想要的“分类文件夹”
-                    // 现在的备份逻辑并没有保存“分类文件夹”信息，只是把角色名作为文件夹名
-                    // 所以导入时，所有角色都会进入当前选中的文件夹
-                    
-                    const newCharId = await saveNewCharacter(fileObj);
-                    
-                    // 恢复批注
-                    // 注意：这里假设文件名（去掉扩展名）就是角色名，这在 saveNewCharacter 中也是这样处理的
-                    // 如果有重名处理逻辑，可能需要更复杂的匹配，但目前先按名字匹配
+                    // 恢复批注逻辑
                     let charName = fileName.replace(/\.[^/.]+$/, "");
-                    // 尝试从 JSON 内容获取名字（如果是 JSON 导入）
                     if (fileName.endsWith('.json')) {
                          try {
                              const jsonContent = JSON.parse(await blob.text());
@@ -3610,39 +3604,65 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
                     }
 
                     if (commentsBackup[charName]) {
-                        const charData = await getCharacter(newCharId);
+                        const charData = await getCharacter(targetCharId);
                         if (charData) {
                             charData.localComment = commentsBackup[charName];
                             await updateCharacter(charData);
                         }
                     }
 
+                    // 记录文件夹路径与 ID 的映射，以便后续导入附件时能找到主人
                     const parentFolder = relativePath.substring(0, relativePath.lastIndexOf('/') + 1);
-                    folderToCharIdMap.set(parentFolder, newCharId);
+                    folderToCharIdMap.set(parentFolder, targetCharId);
                     charCount++;
                 }
             }
+
+            // 3. 第二遍遍历：处理附件
             for (const [relativePath, zipEntry] of Object.entries(zip.files)) {
                 if (zipEntry.dir || relativePath.includes('__MACOSX') || relativePath.includes('.DS_Store')) continue;
+                
                 if (relativePath.includes('/附件/')) {
                     const parts = relativePath.split('/');
                     const attachmentIndex = parts.indexOf('附件');
+                    
                     if (attachmentIndex > 0) {
+                        // 找到该附件所属的角色文件夹路径
                         const charFolderPath = parts.slice(0, attachmentIndex).join('/') + '/';
                         const charId = folderToCharIdMap.get(charFolderPath);
+                        
                         if (charId) {
-                            const blob = await zipEntry.async('blob');
                             const fileName = parts[parts.length-1];
-                            const fileObj = new File([blob], fileName);
-                            await addAttachment({ id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, characterId: charId, fileName: fileName, file: fileObj });
-                            attachmentCount++;
+
+                            // ===== 新增：检查附件是否重复 =====
+                            const existingAttachments = await getAttachmentsByCharacterId(charId);
+                            const isDuplicate = existingAttachments.some(att => att.fileName === fileName);
+
+                            if (!isDuplicate) {
+                                const blob = await zipEntry.async('blob');
+                                const fileObj = new File([blob], fileName);
+                                await addAttachment({ 
+                                    id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, 
+                                    characterId: charId, 
+                                    fileName: fileName, 
+                                    file: fileObj 
+                                });
+                                attachmentCount++;
+                            } else {
+                                console.log(`跳过重复附件: ${fileName}`);
+                            }
+                            // ==============================
                         }
                     }
                 }
             }
-            alert(`导入完成！\n成功恢复了 ${charCount} 张角色卡和 ${attachmentCount} 个附件。\n页面即将刷新。`);
+
+            alert(`导入/同步完成！\n处理了 ${charCount} 张角色卡。\n新增了 ${attachmentCount} 个附件。\n页面即将刷新。`);
             location.reload();
-        } catch (error) { console.error("导入ZIP失败:", error); alert("导入失败，文件可能已损坏或格式不正确。"); }
+        } catch (error) { 
+            console.error("导入ZIP失败:", error); 
+            alert("导入失败，文件可能已损坏或格式不正确。"); 
+        }
     }
     async function exportCharacterCard(charId) {
         const charData = await getCharacter(charId);
@@ -3655,30 +3675,40 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
         const a = document.createElement('a'); a.href = url; a.download = newFileName; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
         alert(`角色卡 "${charName}" 已开始导出！`);
     }
-// 新增：GitHub 备份核心函数
-    async function backupToGitHub() {
+// 上传到 GitHub (原 backupToGitHub)
+async function uploadToGitHub() {
         const username = document.getElementById('github-username').value.trim();
         const repo = document.getElementById('github-repo').value.trim();
         const token = document.getElementById('github-token').value.trim();
         const statusMsg = document.getElementById('github-status-message');
-        const confirmBtn = document.getElementById('btn-confirm-github-backup');
+        
+        // 对应新的按钮 ID
+        const btnUpload = document.getElementById('btn-github-upload');
+        const btnRestore = document.getElementById('btn-github-restore');
 
         if (!username || !repo || !token) {
             statusMsg.textContent = '请填写所有字段。';
             return;
         }
 
-        statusMsg.textContent = '正在生成备份文件...';
-        confirmBtn.disabled = true;
+        // 保存凭据
+        localStorage.setItem('gh_username', username);
+        localStorage.setItem('gh_repo', repo);
+        localStorage.setItem('gh_token', token);
+
+        statusMsg.textContent = '正在打包数据...';
+        btnUpload.disabled = true;
+        btnRestore.disabled = true;
   
         const zipBlob = await generateBackupZipBlob();
         if (!zipBlob) {
-            statusMsg.textContent = '生成备份文件失败。';
-            confirmBtn.disabled = false;
+            statusMsg.textContent = '生成备份文件失败 (可能是库为空)。';
+            btnUpload.disabled = false;
+            btnRestore.disabled = false;
             return;
         }
 
-        statusMsg.textContent = '正在将文件转换为 Base64...';
+        statusMsg.textContent = '正在编码...';
   
         const reader = new FileReader();
         reader.readAsDataURL(zipBlob);
@@ -3687,35 +3717,33 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
             const filePath = 'CharacterBackup.zip';
             const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${filePath}`;
 
-            statusMsg.textContent = '正在连接到 GitHub...';
+            statusMsg.textContent = '正在检查云端旧版本...';
 
             let sha = null;
             try {
-                // 尝试获取现有文件信息，以获得 SHA 值用于更新
                 const response = await fetch(apiUrl, {
                     headers: { 'Authorization': `token ${token}` }
                 });
                 if (response.ok) {
                     const data = await response.json();
                     sha = data.sha;
-                    statusMsg.textContent = '检测到旧备份，准备更新...';
+                    statusMsg.textContent = '发现旧版本，准备覆盖...';
                 } else {
-                    statusMsg.textContent = '未检测到旧备份，将创建新文件...'; 
+                    statusMsg.textContent = '未发现旧版本，准备新建...'; 
                 }
             } catch (e) {
-                // 网络错误等，但我们继续尝试上传
-                statusMsg.textContent = '无法检查旧备份，尝试直接创建...';
+                // 忽略检查错误，尝试直接上传
             }
 
-            const commitMessage = `自动备份: ${new Date().toLocaleString()}`;
+            const commitMessage = `AutoBackup: ${new Date().toLocaleString()}`;
             const uploadData = {
                 message: commitMessage,
                 content: base64Content,
-                sha: sha // 如果是新文件，sha 为 null 也可以
+                sha: sha
             };
 
             try {
-                statusMsg.textContent = '正在上传备份文件...';
+                statusMsg.textContent = '正在上传数据...';
                 const uploadResponse = await fetch(apiUrl, {
                     method: 'PUT',
                     headers: {
@@ -3726,25 +3754,98 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
                 });
 
                 if (uploadResponse.ok) {
-                    statusMsg.textContent = '备份成功！';
+                    statusMsg.textContent = '✅ 上传成功！';
                     setTimeout(() => {
-                        document.getElementById('github-backup-modal').classList.remove('active');
-                        confirmBtn.disabled = false;
-                    }, 2000);
+                        // 不自动关闭，让用户看到成功信息
+                        btnUpload.disabled = false;
+                        btnRestore.disabled = false;
+                    }, 1000);
                 } else {
                     const errorData = await uploadResponse.json();
-                    statusMsg.textContent = `上传失败: ${errorData.message || uploadResponse.statusText}`;
-                    confirmBtn.disabled = false;
+                    statusMsg.textContent = `❌ 上传失败: ${errorData.message}`;
+                    btnUpload.disabled = false;
+                    btnRestore.disabled = false;
                 }
             } catch (error) {
-                statusMsg.textContent = '上传时发生网络错误。';
-                confirmBtn.disabled = false;
+                statusMsg.textContent = '❌ 网络请求失败。';
+                btnUpload.disabled = false;
+                btnRestore.disabled = false;
             }
         };
-        reader.onerror = () => {
-            statusMsg.textContent = '文件转换失败。';
-            confirmBtn.disabled = false;
-        };
+    }
+    // 从 GitHub 恢复数据
+    async function restoreFromGitHub() {
+        const username = document.getElementById('github-username').value.trim();
+        const repo = document.getElementById('github-repo').value.trim();
+        const token = document.getElementById('github-token').value.trim();
+        const statusMsg = document.getElementById('github-status-message');
+        const btnRestore = document.getElementById('btn-github-restore');
+        const btnUpload = document.getElementById('btn-github-upload');
+
+        if (!username || !repo || !token) {
+            statusMsg.textContent = '请先填写所有连接信息。';
+            return;
+        }
+        
+        // 锁定按钮
+        btnRestore.disabled = true;
+        btnUpload.disabled = true;
+        statusMsg.textContent = '正在连接 GitHub 获取文件...';
+
+        // 保存凭据 (方便下次使用)
+        localStorage.setItem('gh_username', username);
+        localStorage.setItem('gh_repo', repo);
+        localStorage.setItem('gh_token', token);
+
+        try {
+            const filePath = 'CharacterBackup.zip';
+            const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${filePath}`;
+
+            // 使用 raw 媒体类型请求，这样 GitHub 会直接返回二进制文件流，而不是 Base64 JSON
+            const response = await fetch(apiUrl, {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3.raw' 
+                }
+            });
+
+            if (!response.ok) {
+                if (response.status === 404) {
+                    throw new Error('云端未找到备份文件 (CharacterBackup.zip)');
+                } else if (response.status === 401) {
+                    throw new Error('Token 无效或无权限');
+                } else {
+                    throw new Error(`下载失败: ${response.status} ${response.statusText}`);
+                }
+            }
+
+            statusMsg.textContent = '正在下载文件...';
+            const blob = await response.blob();
+            
+            // 转换为 File 对象，适配现有的 importFromBackup 函数
+            const file = new File([blob], "CharacterBackup.zip", { type: "application/zip" });
+
+            statusMsg.textContent = '下载完成，开始解析...';
+            
+            // 调用现有的导入逻辑
+            // 注意：我们稍微延迟一下，让 UI 渲染完状态文字
+            setTimeout(() => {
+                if (confirm('下载成功！\n是否立即覆盖导入当前数据？\n(建议先手动备份当前数据)')) {
+                     importFromBackup(file);
+                     document.getElementById('github-backup-modal').classList.remove('active');
+                } else {
+                    statusMsg.textContent = '操作已取消。';
+                }
+                btnRestore.disabled = false;
+                btnUpload.disabled = false;
+            }, 100);
+
+        } catch (error) {
+            console.error(error);
+            statusMsg.textContent = `恢复失败:\n${error.message}`;
+            btnRestore.disabled = false;
+            btnUpload.disabled = false;
+        }
     }
     // --- 页面导航与笔记 ---
     function showPage(pageId) { 
@@ -4209,17 +4310,46 @@ async function changeShowcaseFolder(folderName) {
         });
         document.querySelector('.nav-item[data-target="page-gacha"]').addEventListener('click', resetGacha);
         // 初始化 JSON 导入功能
-        // ==========================================
-        // 修复：GitHub 云端备份按钮事件绑定
-        // ==========================================
+       // ==========================================
+      // GitHub 云端控制台事件绑定 (更新版)
+      // ==========================================
 
-        // 1. 绑定仪表盘上的“云端备份”按钮 -> 打开弹窗
-        const btnBackupGithub = document.getElementById('btn-backup-github');
-        if (btnBackupGithub) {
-            btnBackupGithub.addEventListener('click', () => {
-            document.getElementById('github-backup-modal').classList.add('active');
-        });  
-    }
+      // 1. 打开弹窗
+      const btnBackupGithub = document.getElementById('btn-backup-github');
+      if (btnBackupGithub) {
+          btnBackupGithub.addEventListener('click', () => {
+              // 回填数据
+              const savedUser = localStorage.getItem('gh_username');
+              const savedRepo = localStorage.getItem('gh_repo');
+              const savedToken = localStorage.getItem('gh_token');
+              if (savedUser) document.getElementById('github-username').value = savedUser;
+              if (savedRepo) document.getElementById('github-repo').value = savedRepo;
+              if (savedToken) document.getElementById('github-token').value = savedToken;
+              
+              document.getElementById('github-status-message').textContent = '';
+              document.getElementById('github-backup-modal').classList.add('active');
+          });  
+      }
+
+      // 2. 关闭按钮
+      const btnGithubClose = document.getElementById('btn-github-close');
+      if (btnGithubClose) {
+          btnGithubClose.addEventListener('click', () => {
+              document.getElementById('github-backup-modal').classList.remove('active');
+          });
+      }
+
+      // 3. 上传按钮
+      const btnGithubUpload = document.getElementById('btn-github-upload');
+      if (btnGithubUpload) {
+         btnGithubUpload.addEventListener('click', uploadToGitHub);
+      }
+
+      // 4. 恢复按钮
+      const btnGithubRestore = document.getElementById('btn-github-restore');
+      if (btnGithubRestore) {
+         btnGithubRestore.addEventListener('click', restoreFromGitHub);
+      }
  
        // 2. 绑定弹窗内的“取消”按钮 -> 关闭弹窗
       const btnCancelGithub = document.getElementById('btn-cancel-github-backup');
