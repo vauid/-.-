@@ -493,9 +493,9 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
 #card-stack-container .card-thumb.dismiss-right { transform: translateX(200%) rotate(30deg) !important; opacity: 0 !important; }
 
 /* 堆叠操作按钮 */
-#stack-actions { display: flex; justify-content: center; gap: 30px; margin-top: 20px; }
+#stack-actions { display: flex; justify-content: center; gap: 30px; margin-top: 40px; }
 #stack-actions button { 
-    width: 70px; height: 70px; border-radius: 50%; 
+    width: 40px; height: 40px; border-radius: 50%; 
     border: 1px solid var(--border-color); background-color: var(--panel-color); 
     font-size: 2.5em; cursor: pointer; 
     box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.2s; 
@@ -1851,7 +1851,7 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
                <div class="dashboard-panel" style="padding: 0; overflow: hidden;">
                    <div class="panel-header" style="padding: 15px 20px; border-bottom: 1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
                        <h3 id="dashboard-showcase-title" onclick="openShowcaseSelector()" style="margin:0; cursor:pointer; display:flex; align-items:center; gap:8px;">
-                        𝕮𝖗𝖚𝖘𝖍 𝕭𝖊𝖘𝖙 <span style="font-size:0.7em; opacity:0.5;">▼</span>
+                        我的最爱 <span style="font-size:0.7em; opacity:0.5;">▼</span>
                       </h3>
                        <span style="font-size:0.8em; color:var(--text-secondary-color);">点击标题切换</span>
                   </div>
@@ -2402,7 +2402,7 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
          if (titleEl) {
              // 根据文件夹名字给个不同的 emoji (可选)
              let icon = '📂';
-             if (currentShowcaseFolder === '我的最爱') icon = '💖';
+             if (currentShowcaseFolder === '我的最爱') icon = '🤍';
              else if (currentShowcaseFolder === '回收站') icon = '🗑️';
          
              titleEl.innerHTML = `${icon} ${currentShowcaseFolder} <span style="font-size:0.7em; opacity:0.5;">▼</span>`;
@@ -2761,7 +2761,7 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
                 currentCardIndex = (currentCardIndex + 1) % total;
                 updateCardStackUI();
                 isAnimating = false;
-            }, 500);
+            }, 200);
         }
         // 右滑：上一张 (Prev)
         else {
@@ -2770,7 +2770,7 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
                 currentCardIndex = (currentCardIndex - 1 + total) % total;
                 updateCardStackUI();
                 isAnimating = false;
-            }, 500);
+            }, 200);
         }
     }
 
