@@ -502,8 +502,8 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
     display: flex; justify-content: center; align-items: center; padding: 0;
 }
 #stack-actions button:hover { transform: scale(1.1); }
-#btn-nope { color: var(--danger-color); }
-#btn-like { color: var(--success-color); }
+#btn-swipe-left, #btn-swipe-right { color: var(--text-secondary-color); }
+#btn-swipe-left:hover, #btn-swipe-right:hover { color: var(--primary-color); transform: scale(1.1); }
 
 /* =========================================
    5. 仪表盘 (Dashboard)
@@ -927,17 +927,62 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     white-space: nowrap; max-width: 30%; overflow: hidden; text-overflow: ellipsis;
 }
+.gacha-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 10px;
+    z-index: 20;
+}
 .summon-btn {
     background: linear-gradient(135deg, #fff, #e0e0e0);
-    color: #000; border: none; padding: 16px 60px;
+    color: #000; border: none; padding: 16px 40px;
     font-size: 1.1em; font-weight: 800; border-radius: 50px;
     cursor: pointer; box-shadow: 0 0 25px rgba(255, 255, 255, 0.15);
-    transition: all 0.3s; z-index: 20;
-    display: flex; align-items: center; gap: 8px; margin-top: 10px;
+    transition: all 0.3s;
+    display: flex; align-items: center; gap: 8px;
 }
 .summon-btn:hover { transform: scale(1.05); box-shadow: 0 0 35px rgba(255, 255, 255, 0.3); }
 .summon-btn:active { transform: scale(0.95); }
 .summon-btn svg { width: 20px; height: 20px; }
+
+.pool-select-btn {
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    display: flex; justify-content: center; align-items: center;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    transition: all 0.2s;
+}
+.pool-select-btn:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.1); }
+.pool-select-btn svg { width: 24px; height: 24px; }
+
+/* 卡池选择弹窗 */
+.pool-list {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    justify-content: center; padding: 10px 0;
+    max-height: 300px; overflow-y: auto;
+}
+.pool-option {
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary-color);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9em;
+    user-select: none;
+}
+.pool-option.selected {
+    background: var(--primary-color);
+    color: var(--bg-color);
+    border-color: var(--primary-color);
+    font-weight: 600;
+}
 @keyframes gacha-shake {
     0% { transform: rotate(0deg); } 25% { transform: rotate(3deg); }
     50% { transform: rotate(0deg); } 75% { transform: rotate(-3deg); }
@@ -1603,53 +1648,197 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
     transform: scale(0.96);
     opacity: 0.9;
 }
+/* 视图切换按钮 */
+#btn-toggle-view { margin-right: 0; }
+
+/* 列表视图容器 */
+#card-list-view { display: none; width: 100%; margin-top: 20px; }
+#card-list-view.active { display: block; }
+
+/* 列表网格 */
+.card-list-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* 手机单列 */
+    gap: 15px;
+    margin-bottom: 20px;
+}
+@media (min-width: 768px) {
+    .card-list-grid { grid-template-columns: 1fr 1fr; } /* 电脑双列 */
+}
+
+/* 列表卡片 */
+.list-card-item {
+    background-color: var(--panel-color);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
+}
+.list-card-item:hover {
+    transform: translateY(-2px);
+    background-color: var(--panel-secondary-color);
+}
+.list-card-thumb {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    object-fit: cover;
+    background-color: var(--panel-secondary-color);
+    flex-shrink: 0;
+}
+.list-card-info {
+    flex-grow: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.list-card-name {
+    font-weight: 600;
+    font-size: 1em;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.list-card-comment {
+    font-size: 0.85em;
+    color: var(--text-secondary-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0.8;
+}
+.list-card-folder {
+    font-size: 0.75em;
+    color: var(--primary-color);
+    opacity: 0.6;
+}
+
+/* 分页控件 */
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 80px; /* 留出底部导航栏空间 */
+}
+.page-btn {
+    background-color: var(--panel-secondary-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+.page-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+.page-info {
+    font-size: 0.9em;
+    color: var(--text-secondary-color);
+}
+
+/* 详情页批注输入框 */
+#detail-comment-input {
+    width: 100% !important;
+    padding: 12px 16px !important;
+    margin-bottom: 12px !important;
+    border-radius: 16px !important;
+    background-color: var(--panel-secondary-color) !important;
+    border: 1px solid transparent !important;
+    color: var(--text-color) !important;
+    font-size: 0.95em !important;
+    font-family: inherit;
+    resize: none;
+    outline: none;
+    box-sizing: border-box;
+    min-height: 80px;
+}
+#detail-comment-input:focus {
+    border-color: var(--primary-color) !important;
+    background-color: var(--bg-color) !important;
+}
+
+/* 堆叠卡片上的批注 */
+.card-thumb .comment-bar {
+    font-size: 0.8em;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: normal;
+}
 </style>
 </head>
 <body>
     <!-- 页面一：资料库 -->
-<div id="page-library" class="page active">
-    <div class="container">
-        <!-- 头部：仅包含标题 -->
-        <div class="page-header">
-            <h1>角色卡资料库</h1>
-        </div>
-
-        <!-- 操作栏：包含搜索和上传按钮 -->
-        <div class="header-actions">
-            <div class="search-container">
-                <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <input type="search" id="search-input" placeholder="搜索角色卡...">
+    <div id="page-library" class="page active">
+        <div class="container">
+            <!-- 头部：仅包含标题 -->
+            <div class="page-header">
+                <h1>角色卡资料库</h1>
             </div>
-            <button id="btn-upload" class="header-action-btn" title="上传文件">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 16.5V3M12 3L16.5 7.5M12 3L7.5 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v4.5c0 1.988-1.59 3.6-3.558 3.6H6.558C4.59 20.1 3 18.488 3 16.5V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-        </div>
-        <!-- ===== 新增：文件夹导航栏 ===== -->
-        <div class="folder-scroll-container" id="folder-nav">
-        <!-- 将由JS动态生成 -->
-        </div>
-        <!-- 隐藏的文件输入框 (用于上传图片/JSON) -->
-        <input type="file" id="file-input" multiple style="display: none;">
-        <!-- ===== 新增：隐藏的 ZIP 导入输入框 (修复导入功能) ===== -->
-        <input type="file" id="import-zip-input" accept=".zip" style="display: none;">
-        
-        <!-- 卡片堆叠区域 -->
-        <div id="card-stack-container"></div>
-        
-        <!-- 喜欢/不喜欢按钮 -->
-        <div id="stack-actions">
-            <!-- 替换 ✤ 为 X 图标 -->
-            <button id="btn-nope" title="不喜欢">
-                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-            <!-- 替换 ✭ 为 心形图标 -->
-            <button id="btn-like" title="喜欢">
-                <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            </button>
-        </div>
 
-    </div> <!-- 这个是 .container 的正确闭合标签 -->
-</div> <!-- 这个是 #page-library 的正确闭合标签 -->
+            <!-- 操作栏：包含搜索和上传按钮 -->
+            <div class="header-actions">
+                <div class="search-container">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <input type="search" id="search-input" placeholder="搜索角色卡...">
+                </div>
+                <!-- 视图切换按钮 -->
+                <button id="btn-toggle-view" class="header-action-btn" title="切换视图">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                </button>
+                <button id="btn-upload" class="header-action-btn" title="上传文件">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 16.5V3M12 3L16.5 7.5M12 3L7.5 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v4.5c0 1.988-1.59 3.6-3.558 3.6H6.558C4.59 20.1 3 18.488 3 16.5V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+            </div>
+            <!-- ===== 新增：文件夹导航栏 ===== -->
+            <div class="folder-scroll-container" id="folder-nav">
+            <!-- 将由JS动态生成 -->
+            </div>
+            <!-- 隐藏的文件输入框 (用于上传图片/JSON) -->
+            <input type="file" id="file-input" multiple style="display: none;">
+            <!-- ===== 新增：隐藏的 ZIP 导入输入框 (修复导入功能) ===== -->
+            <input type="file" id="import-zip-input" accept=".zip" style="display: none;">
+            
+            <!-- 卡片堆叠区域 -->
+            <div id="card-stack-container"></div>
+            
+            <!-- 喜欢/不喜欢按钮 -->
+            <div id="stack-actions">
+                <button id="btn-swipe-left" title="上一张">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M5 12l7-7M5 12l7 7"/></svg>
+                </button>
+                <button id="btn-swipe-right" title="下一张">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M19 12l-7-7M19 12l-7 7"/></svg>
+                </button>
+            </div>
+
+            <!-- 列表视图区域 -->
+            <div id="card-list-view">
+                <div id="card-list-grid" class="card-list-grid"></div>
+                <div class="pagination-controls">
+                    <button id="btn-prev-page" class="page-btn"><</button>
+                    <span id="page-info" class="page-info">1 / 1</span>
+                    <button id="btn-next-page" class="page-btn">></button>
+                </div>
+            </div>
+
+        </div> <!-- 这个是 .container 的正确闭合标签 -->
+    </div> <!-- 这个是 #page-library 的正确闭合标签 -->
 
     <!-- 页面二：仪表盘 (新版) -->
     <div id="page-dashboard" class="page">
@@ -1788,10 +1977,15 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
           </div>
       </div>
 
-      <button id="btn-summon" class="summon-btn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          <span>开始召唤</span>
-     </button>
+      <div class="gacha-controls">
+          <button id="btn-pool-select" class="pool-select-btn" title="选择卡池">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path><line x1="12" y1="11" x2="12" y2="17"></line><line x1="9" y1="14" x2="15" y2="14"></line></svg>
+          </button>
+          <button id="btn-summon" class="summon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <span>开始召唤</span>
+         </button>
+      </div>
 
      <div class="gacha-actions" id="gacha-actions">
          <button class="gacha-action-btn" id="btn-gacha-detail">查看详情</button>
@@ -1846,6 +2040,11 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
                  <h3 style="text-align: left; font-size: 0.9em; margin-bottom: 5px; color:var(--text-secondary-color);">所属文件夹</h3>
                  <select id="detail-folder-select" class="detail-folder-select"></select>
              </div>
+             <!-- ===== 新增：本地批注区域 ===== -->
+             <div class="detail-section">
+                <h3 style="text-align: left; font-size: 0.9em; margin-bottom: 5px; color:var(--text-secondary-color);">本地批注</h3>
+                <textarea id="detail-comment-input" placeholder="添加本地备注（仅保存在此设备）..."></textarea>
+            </div>
              <!-- 附件区域现在在滚动容器内部 -->
              <div id="attachments-summary-section" class="detail-section">
                 <div class="detail-section-header">
@@ -1973,6 +2172,25 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
            <button class="capsule-btn" style="width:100%;" onclick="document.getElementById('reorder-confirm-modal').classList.remove('active')">取消</button>
       </div>
 </div>
+    <!-- 卡池选择弹窗 -->
+    <div class="modal-overlay" id="pool-select-modal">
+        <div class="glass-modal-content">
+            <h3 style="margin:0; font-size:1.1em;">选择卡池</h3>
+            <p style="margin:0; font-size:0.8em; color:var(--text-secondary-color); text-align:center;">
+                选择参与抽取的文件夹 (可多选)
+            </p>
+            
+            <div class="pool-list" id="pool-options-container">
+                <!-- JS 生成 -->
+            </div>
+
+            <div style="display:flex; gap:10px; width:100%; margin-top:10px;">
+                <button class="capsule-btn" style="flex:1;" onclick="selectAllPools()">全选</button>
+                <button class="capsule-btn highlight" style="flex:1;" onclick="confirmPoolSelection()">确定</button>
+            </div>
+        </div>
+    </div>
+
      <!-- ===== GitHub 备份弹窗 (修复版) ===== -->
  <div class="modal-overlay" id="github-backup-modal">
      <div class="modal-content">
@@ -2029,6 +2247,11 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
     let currentGachaCharId = null; 
     let dashboardImageUrls = []; // 用于仪表盘内存清理
     let currentShowcaseFolder = '我的最爱'; // 默认值
+    let isAnimating = false;
+    let currentViewMode = 'stack'; // 'stack' or 'list'
+    let currentPage = 1;
+    const ITEMS_PER_PAGE = 10;
+    let selectedPools = []; // 存储选中的文件夹名称
     // ==========================================
     // 2. 数据库初始化与操作
     // ==========================================
@@ -2269,17 +2492,62 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
          const gachaCard = document.getElementById('gacha-card');
          const summonBtn = document.getElementById('btn-summon');
          const gachaActions = document.getElementById('gacha-actions');
+         const poolBtn = document.getElementById('btn-pool-select');
          
          gachaCard.classList.remove('flipped');
          gachaActions.classList.remove('show');
          summonBtn.style.display = 'flex';
+         poolBtn.style.display = 'flex'; // 显示卡池按钮
          summonBtn.disabled = false;
          summonBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><span>开始召唤</span>`;
     }
 
+    // 打开卡池选择弹窗
+    function openPoolSelectModal() {
+        const container = document.getElementById('pool-options-container');
+        container.innerHTML = '';
+        
+        // 如果还没初始化过，默认全选
+        if (selectedPools.length === 0) {
+            selectedPools = [...folders];
+        }
+
+        folders.forEach(folder => {
+            const div = document.createElement('div');
+            div.className = `pool-option ${selectedPools.includes(folder) ? 'selected' : ''}`;
+            div.textContent = folder;
+            div.onclick = () => {
+                div.classList.toggle('selected');
+                if (div.classList.contains('selected')) {
+                    if (!selectedPools.includes(folder)) selectedPools.push(folder);
+                } else {
+                    selectedPools = selectedPools.filter(f => f !== folder);
+                }
+            };
+            container.appendChild(div);
+        });
+        
+        document.getElementById('pool-select-modal').classList.add('active');
+    }
+
+    function selectAllPools() {
+        selectedPools = [...folders];
+        const options = document.querySelectorAll('.pool-option');
+        options.forEach(opt => opt.classList.add('selected'));
+    }
+
+    function confirmPoolSelection() {
+        if (selectedPools.length === 0) {
+            alert("请至少选择一个文件夹！");
+            return;
+        }
+        document.getElementById('pool-select-modal').classList.remove('active');
+    }
+
     async function performSummon() {
-        const allChars = await getAllCharacters();
+        let allChars = await getAllCharacters();
         const summonBtn = document.getElementById('btn-summon');
+        const poolBtn = document.getElementById('btn-pool-select');
         const gachaCard = document.getElementById('gacha-card');
         const flashOverlay = document.getElementById('gacha-flash');
         const gachaActions = document.getElementById('gacha-actions');
@@ -2289,11 +2557,25 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
            return;
         }
 
+        // 默认全选
+        if (selectedPools.length === 0) selectedPools = [...folders];
+
+        // 筛选卡池
+        const poolChars = allChars.filter(char => {
+            const folder = char.folder || '默认文件夹';
+            return selectedPools.includes(folder);
+        });
+
+        if (poolChars.length === 0) {
+            alert("所选卡池中没有角色卡！");
+            return;
+        }
+
        summonBtn.disabled = true;
        summonBtn.textContent = "召唤中...";
     
-       const randomIndex = Math.floor(Math.random() * allChars.length);
-       const winner = allChars[randomIndex];
+       const randomIndex = Math.floor(Math.random() * poolChars.length);
+       const winner = poolChars[randomIndex];
        currentGachaCharId = winner.id;
 
        const fileForDisplay = winner.thumbnailFile || winner.originalFile;
@@ -2314,6 +2596,7 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
                flashOverlay.classList.remove('active');
                gachaCard.classList.add('flipped');
                summonBtn.style.display = 'none';
+               poolBtn.style.display = 'none'; // 隐藏卡池按钮
                setTimeout(() => {
                    gachaActions.classList.add('show');
               }, 400);
@@ -2325,9 +2608,12 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
     async function renderAllCharacterCards(charactersToRender) {
         createdImageUrls.forEach(url => URL.revokeObjectURL(url));
         createdImageUrls = [];
-        const cardContainer = document.getElementById('card-stack-container');
-        if (!cardContainer) return;
-        cardContainer.innerHTML = '';
+        
+        const stackContainer = document.getElementById('card-stack-container');
+        const stackActions = document.getElementById('stack-actions');
+        const listView = document.getElementById('card-list-view');
+        
+        if (!stackContainer || !listView) return;
 
         let allChars = charactersToRender;
         if (!allChars) {
@@ -2342,8 +2628,23 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
 
         filteredChars.sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
     
+        // 视图切换逻辑
+        if (currentViewMode === 'list') {
+            stackContainer.style.display = 'none';
+            stackActions.style.display = 'none';
+            listView.classList.add('active');
+            renderCardList(filteredChars);
+            return;
+        } else {
+            stackContainer.style.display = 'block';
+            stackActions.style.display = 'flex';
+            listView.classList.remove('active');
+        }
+
+        stackContainer.innerHTML = '';
+
         if (filteredChars.length === 0) {
-            cardContainer.innerHTML = `<div style="color:var(--text-secondary-color); text-align:center; padding-top:100px;">
+            stackContainer.innerHTML = `<div style="color:var(--text-secondary-color); text-align:center; padding-top:100px;">
                 <h3>"${currentFolder}" 是空的</h3>
                 <p>去其他文件夹看看，或者添加新卡片</p>
            </div>`;
@@ -2365,15 +2666,113 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
            } else {
               imageHtml = `<div class="json-icon">{}</div>`;
            }
-           thumb.innerHTML = `<div class="card-image-wrapper">${imageHtml}</div><div class="name-bar">${charData.name}</div>`;
-            cardContainer.appendChild(thumb);
+           // 加入批注显示
+           const commentHtml = charData.localComment ? `<div class="comment-bar">${charData.localComment}</div>` : '';
+           thumb.innerHTML = `<div class="card-image-wrapper">${imageHtml}</div><div class="name-bar">${charData.name}${commentHtml}</div>`;
+            stackContainer.appendChild(thumb);
         });
         initCardStack();
     }
+
+    function renderCardList(chars) {
+        const grid = document.getElementById('card-list-grid');
+        const prevBtn = document.getElementById('btn-prev-page');
+        const nextBtn = document.getElementById('btn-next-page');
+        const pageInfo = document.getElementById('page-info');
+        
+        grid.innerHTML = '';
+        
+        if (chars.length === 0) {
+            grid.innerHTML = `<div class="empty-state-text">没有找到角色卡</div>`;
+            pageInfo.textContent = '0 / 0';
+            prevBtn.disabled = true;
+            nextBtn.disabled = true;
+            return;
+        }
+
+        const totalPages = Math.ceil(chars.length / ITEMS_PER_PAGE);
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+
+        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+        const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, chars.length);
+        const pageItems = chars.slice(startIndex, endIndex);
+
+        pageItems.forEach(char => {
+            const item = document.createElement('div');
+            item.className = 'list-card-item';
+            item.onclick = () => openDetailView(char.id);
+
+            let imgHtml = '';
+            const fileForDisplay = char.thumbnailFile || char.originalFile;
+            if (fileForDisplay && fileForDisplay.type.startsWith('image/')) {
+                const url = URL.createObjectURL(fileForDisplay);
+                createdImageUrls.push(url);
+                imgHtml = `<img src="${url}" class="list-card-thumb">`;
+            } else {
+                imgHtml = `<div class="list-card-thumb" style="display:flex;align-items:center;justify-content:center;font-size:1.5em;">{}</div>`;
+            }
+
+            item.innerHTML = `
+                ${imgHtml}
+                <div class="list-card-info">
+                    <div class="list-card-name">${char.name}</div>
+                    <div class="list-card-comment">${char.localComment || '无批注'}</div>
+                    <div class="list-card-folder">📂 ${char.folder || '默认文件夹'}</div>
+                </div>
+            `;
+            grid.appendChild(item);
+        });
+
+        pageInfo.textContent = `${currentPage} / ${totalPages}`;
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage === totalPages;
+    }
     
     function initCardStack() { allCharacterCards = Array.from(document.querySelectorAll('#card-stack-container .card-thumb')); currentCardIndex = 0; updateCardStackUI(); }
-    function updateCardStackUI() { allCharacterCards.forEach((card, index) => { card.classList.remove('current', 'next', 'after-next', 'dismiss-left', 'dismiss-right'); if (index === currentCardIndex) { card.classList.add('current'); } else if (index === currentCardIndex + 1) { card.classList.add('next'); } else if (index === currentCardIndex + 2) { card.classList.add('after-next'); } }); }
-    function dismissCard(direction) { if (currentCardIndex >= allCharacterCards.length) { if (confirm("已经是最后一张了，要从头开始吗？")) { currentCardIndex = 0; updateCardStackUI(); } return; } const cardToDismiss = allCharacterCards[currentCardIndex]; cardToDismiss.classList.add(direction === 'left' ? 'dismiss-left' : 'dismiss-right'); currentCardIndex++; setTimeout(() => { updateCardStackUI(); }, 100); }
+    function updateCardStackUI() {
+        const total = allCharacterCards.length;
+        if (total === 0) return;
+        
+        allCharacterCards.forEach(c => c.classList.remove('current', 'next', 'after-next', 'dismiss-left', 'dismiss-right'));
+        
+        // 循环模式：计算当前、下一张、下下一张的索引
+        const curIndex = currentCardIndex % total;
+        const nextIndex = (currentCardIndex + 1) % total;
+        const afterNextIndex = (currentCardIndex + 2) % total;
+
+        allCharacterCards[curIndex].classList.add('current');
+        if (total > 1) allCharacterCards[nextIndex].classList.add('next');
+        if (total > 2) allCharacterCards[afterNextIndex].classList.add('after-next');
+    }
+
+    function handleSwipe(direction) {
+        if (isAnimating) return;
+        const total = allCharacterCards.length;
+        if (total === 0) return;
+
+        isAnimating = true;
+        const currentCard = allCharacterCards[currentCardIndex];
+        
+        // 左滑：下一张 (Next)
+        if (direction === 'left') {
+            currentCard.classList.add('dismiss-left');
+            setTimeout(() => {
+                currentCardIndex = (currentCardIndex + 1) % total;
+                updateCardStackUI();
+                isAnimating = false;
+            }, 500);
+        }
+        // 右滑：上一张 (Prev)
+        else {
+            currentCard.classList.add('dismiss-right');
+            setTimeout(() => {
+                currentCardIndex = (currentCardIndex - 1 + total) % total;
+                updateCardStackUI();
+                isAnimating = false;
+            }, 500);
+        }
+    }
 
     // --- 详情页逻辑 ---
     async function openDetailView(charId) {
@@ -2396,6 +2795,8 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
         badge.textContent = attachments.length;
         badge.style.display = attachments.length > 0 ? 'inline-block' : 'none';
         populateDetailFolderSelect(charData);
+        // 回显批注
+        document.getElementById('detail-comment-input').value = charData.localComment || '';
         detailView.classList.add('active');
    }
    
@@ -2743,9 +3144,16 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
         const rootFolderName = '角色卡备份';
         const rootFolder = zip.folder(rootFolderName);
         const folderNames = new Set();
+        const allComments = {}; // 收集所有批注
 
         for (const charData of allChars) {
             if (!charData.originalFile) continue;
+            
+            // 收集批注
+            if (charData.localComment) {
+                allComments[charData.name] = charData.localComment;
+            }
+
             let charFolderName = charData.name || '未命名角色';
             let counter = 1;
             let finalFolderName = charFolderName;
@@ -2786,6 +3194,12 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
                 }
             }
         }
+
+        // 将所有批注保存为一个 JSON 文件
+        if (Object.keys(allComments).length > 0) {
+            rootFolder.file('all_comments_backup.json', JSON.stringify(allComments, null, 2));
+        }
+
         return await zip.generateAsync({ type: 'blob' });
     }
  
@@ -2818,12 +3232,81 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
             let charCount = 0;
             let attachmentCount = 0;
             const folderToCharIdMap = new Map();
+            let commentsBackup = {};
+
+            // 先读取批注备份文件
+            const commentsFile = Object.values(zip.files).find(f => f.name.endsWith('all_comments_backup.json'));
+            if (commentsFile) {
+                try {
+                    const text = await commentsFile.async('text');
+                    commentsBackup = JSON.parse(text);
+                } catch (e) {
+                    console.error("读取批注备份失败", e);
+                }
+            }
+
             for (const [relativePath, zipEntry] of Object.entries(zip.files)) {
                 if (zipEntry.dir || relativePath.includes('__MACOSX') || relativePath.includes('.DS_Store')) continue;
-                if (!relativePath.includes('/附件/') && (relativePath.match(/\.(png|json)$/i))) {
+                
+                // 跳过批注备份文件本身
+                if (zipEntry.name.endsWith('all_comments_backup.json')) continue;
+
+                if (!relativePath.includes('/附件/') && (relativePath.match(/\.(png|json|webp|jpeg|jpg)$/i))) {
                     const blob = await zipEntry.async('blob');
-                    const fileObj = new File([blob], zipEntry.name.split('/').pop(), { type: blob.type });
-                    const newCharId = await saveNewCharacter(fileObj); 
+                    const fileName = zipEntry.name.split('/').pop();
+                    
+                    // 显式指定 MIME 类型，因为 JSZip 可能无法自动推断，或者 blob.type 为空
+                    let mimeType = blob.type;
+                    if (!mimeType) {
+                        if (fileName.endsWith('.png')) mimeType = 'image/png';
+                        else if (fileName.endsWith('.json')) mimeType = 'application/json';
+                        else if (fileName.endsWith('.webp')) mimeType = 'image/webp';
+                        else if (fileName.endsWith('.jpeg') || fileName.endsWith('.jpg')) mimeType = 'image/jpeg';
+                    }
+
+                    const fileObj = new File([blob], fileName, { type: mimeType });
+                    
+                    // 保存角色
+                    // 导入时，强制使用文件名作为角色名，避免重复导入时被覆盖或无法识别
+                    // 同时，导入时应该允许覆盖或重命名，但这里为了简化，我们先假设是新导入
+                    // 注意：saveNewCharacter 内部会处理重名（虽然目前逻辑是直接添加，可能会有重复）
+                    // 关键修复：确保 fileObj 的 type 正确，否则 saveNewCharacter 可能会失败
+                    
+                    // 尝试从路径中提取文件夹名
+                    const pathParts = relativePath.split('/');
+                    // 假设结构是 根目录/角色名/角色卡.png
+                    // pathParts 可能是 ['角色卡备份', '角色名', '角色卡.png']
+                    // 我们需要 '角色名' 作为文件夹名（如果它是一个文件夹的话）
+                    // 但目前的逻辑是把所有导入的角色都放到 currentFolder
+                    
+                    // 临时切换 currentFolder 为导入的角色所在的文件夹名（如果是按文件夹结构备份的）
+                    // 备份结构：根目录/角色名/角色卡文件
+                    // 所以倒数第二个部分可能是角色名，但这通常不是我们想要的“分类文件夹”
+                    // 现在的备份逻辑并没有保存“分类文件夹”信息，只是把角色名作为文件夹名
+                    // 所以导入时，所有角色都会进入当前选中的文件夹
+                    
+                    const newCharId = await saveNewCharacter(fileObj);
+                    
+                    // 恢复批注
+                    // 注意：这里假设文件名（去掉扩展名）就是角色名，这在 saveNewCharacter 中也是这样处理的
+                    // 如果有重名处理逻辑，可能需要更复杂的匹配，但目前先按名字匹配
+                    let charName = fileName.replace(/\.[^/.]+$/, "");
+                    // 尝试从 JSON 内容获取名字（如果是 JSON 导入）
+                    if (fileName.endsWith('.json')) {
+                         try {
+                             const jsonContent = JSON.parse(await blob.text());
+                             charName = jsonContent.name || jsonContent.data?.name || charName;
+                         } catch(e) {}
+                    }
+
+                    if (commentsBackup[charName]) {
+                        const charData = await getCharacter(newCharId);
+                        if (charData) {
+                            charData.localComment = commentsBackup[charName];
+                            await updateCharacter(charData);
+                        }
+                    }
+
                     const parentFolder = relativePath.substring(0, relativePath.lastIndexOf('/') + 1);
                     folderToCharIdMap.set(parentFolder, newCharId);
                     charCount++;
@@ -3201,14 +3684,112 @@ async function changeShowcaseFolder(folderName) {
         });
     }
     function setupEventListeners() {
+        // 视图切换
+        document.getElementById('btn-toggle-view').addEventListener('click', () => {
+            currentViewMode = currentViewMode === 'stack' ? 'list' : 'stack';
+            // 切换图标
+            const btn = document.getElementById('btn-toggle-view');
+            if (currentViewMode === 'list') {
+                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2zM9 17h10a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v0a2 2 0 0 1 2-2z"></path></svg>`; // 换成堆叠图标
+            } else {
+                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`; // 换成列表图标
+            }
+            renderAllCharacterCards();
+        });
+        
+        // 分页按钮
+        document.getElementById('btn-prev-page').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderAllCharacterCards();
+            }
+        });
+        document.getElementById('btn-next-page').addEventListener('click', () => {
+            currentPage++;
+            renderAllCharacterCards();
+        });
+        
+        // 批注自动保存
+        document.getElementById('detail-comment-input').addEventListener('input', async (e) => {
+            if (!currentDetailCharId) return;
+            const comment = e.target.value;
+            try {
+                const charData = await getCharacter(currentDetailCharId);
+                if (charData) {
+                    charData.localComment = comment;
+                    await updateCharacter(charData);
+                    // 如果当前是列表视图，实时更新列表显示
+                    if (currentViewMode === 'list') {
+                        renderAllCharacterCards();
+                    }
+                }
+            } catch (err) {
+                console.error("保存批注失败", err);
+            }
+        });
+
         document.getElementById('btn-upload').addEventListener('click', () => document.getElementById('file-input').click());
         document.getElementById('file-input').addEventListener('change', (e) => handleFileDrop(e.target.files));
         document.getElementById('search-input').addEventListener('input', handleSearch);
-        document.getElementById('btn-nope').addEventListener('click', () => dismissCard('left'));
-        document.getElementById('btn-like').addEventListener('click', () => dismissCard('right'));
-        document.getElementById('card-stack-container').addEventListener('click', (e) => { const thumb = e.target.closest('.card-thumb.current'); if (thumb) { openDetailView(parseInt(thumb.dataset.id)); } });
+        // 交换按钮逻辑：左箭头按钮触发右滑（上一张），右箭头按钮触发左滑（下一张）
+        document.getElementById('btn-swipe-left').addEventListener('click', () => handleSwipe('right'));
+        document.getElementById('btn-swipe-right').addEventListener('click', () => handleSwipe('left'));
+        // 优化点击事件：如果是滑动操作则不触发点击
+        let isSwiping = false;
+        document.getElementById('card-stack-container').addEventListener('click', (e) => {
+            if (isSwiping) return;
+            const thumb = e.target.closest('.card-thumb.current');
+            if (thumb) { openDetailView(parseInt(thumb.dataset.id)); }
+        });
+
+        // 添加触摸滑动支持
+        const cardStack = document.getElementById('card-stack-container');
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        cardStack.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+            isSwiping = false;
+        }, {passive: true});
+        
+        cardStack.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (Math.abs(touchEndX - touchStartX) > 50) {
+                isSwiping = true; // 标记为滑动
+                if (touchEndX < touchStartX) handleSwipe('left');
+                if (touchEndX > touchStartX) handleSwipe('right');
+            }
+        }, {passive: true});
+
+        // 添加鼠标拖拽支持 (桌面端体验)
+        let mouseStartX = 0;
+        let isMouseDown = false;
+
+        cardStack.addEventListener('mousedown', e => {
+            mouseStartX = e.clientX;
+            isMouseDown = true;
+            isSwiping = false;
+        });
+
+        cardStack.addEventListener('mouseup', e => {
+            if (!isMouseDown) return;
+            isMouseDown = false;
+            const mouseEndX = e.clientX;
+            if (Math.abs(mouseEndX - mouseStartX) > 50) {
+                isSwiping = true;
+                if (mouseEndX < mouseStartX) handleSwipe('left');
+                if (mouseEndX > mouseStartX) handleSwipe('right');
+            }
+        });
+
+        cardStack.addEventListener('mouseleave', () => { isMouseDown = false; });
+
         document.getElementById('note-search-input').addEventListener('input', renderNoteList);
         // ✅ 新增：下拉框改变时也自动保存
+        document.getElementById('btn-summon').addEventListener('click', performSummon);
+        document.getElementById('btn-gacha-again').addEventListener('click', resetGacha);
+        document.getElementById('btn-gacha-detail').addEventListener('click', () => openDetailView(currentGachaCharId));
+        document.getElementById('btn-pool-select').addEventListener('click', openPoolSelectModal);
         document.getElementById('note-link-char-select').addEventListener('change', autoSaveCurrentNote);
         const detailView = document.getElementById('card-detail-view');
         const actionMenu = document.getElementById('detail-action-menu');
