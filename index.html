@@ -78,7 +78,7 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
 .page-header h1 {
     margin: 0;
     text-align: left;
-    font-size: 1.4em;
+    font-size: 1.3em;
 }
 .header-actions {
     display: flex;
@@ -459,113 +459,51 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
     border-style: dashed;
 }
 
-/* =========================================
-   4. 资料库 (流畅 3D 堆叠版)
-   ========================================= */
-
-/* 容器视角调整 */
-#card-stack-container { 
-    position: relative; 
-    width: 100%; 
-    max-width: 350px; 
-    height: 480px; /* 稍微加高一点 */
-    margin: 20px auto; 
-    perspective: 1200px; /* 增强 3D 纵深感 */
-    transform-style: preserve-3d;
-}
-
-/* 卡片基础样式 */
+/* 卡片堆叠 */
+#card-stack-container { position: relative; width: 100%; max-width: 350px; height: 450px; margin: 30px auto; perspective: 1000px; }
 #card-stack-container .card-thumb {
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%;
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     border-radius: 24px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.4); /* 更柔和的阴影 */
+    box-shadow: 0 15px 30px rgba(0,0,0,0.3);
     background-color: var(--panel-color);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    
-    /* 关键：平滑过渡设置 */
-    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), 
-                opacity 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
-                filter 0.4s ease;
-    
+    border: 1px solid var(--border-color);
+    will-change: transform, opacity;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     cursor: grab;
-    display: flex; 
-    flex-direction: column; 
-    overflow: hidden;
-    transform-origin: 50% 100%; /* 底部中心为旋转支点，像翻牌一样 */
-    backface-visibility: hidden; /* 性能优化 */
-    will-change: transform, opacity; /* 性能优化 */
+    display: flex; flex-direction: column; overflow: hidden;
+    transform: translateZ(0);
 }
+.card-thumb .card-image-wrapper { flex-grow: 1; background-color: var(--panel-secondary-color); }
+.card-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.card-thumb .json-icon { font-size: 4em; color: var(--text-secondary-color); display: flex; align-items: center; justify-content: center; height: 100%; }
+.card-thumb .name-bar {
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    color: white;
+    padding: 25px 15px 15px 15px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 1.2em;
+    position: absolute; bottom: 0; width: 100%; box-sizing: border-box;
+}
+#card-stack-container .card-thumb.current { transform: translateY(0) scale(1); opacity: 1; z-index: 3; pointer-events: auto; }
+#card-stack-container .card-thumb.next { transform: translateY(25px) scale(0.95); opacity: 1; z-index: 2; pointer-events: none; }
+#card-stack-container .card-thumb.after-next { transform: translateY(50px) scale(0.9); opacity: 1; z-index: 1; pointer-events: none; }
+#card-stack-container .card-thumb:not(.current):not(.next):not(.after-next) { opacity: 0; pointer-events: none; transform: translateY(75px) scale(0.85); }
+#card-stack-container .card-thumb.dismiss-left { transform: translateX(-200%) rotate(-30deg) !important; opacity: 0 !important; }
+#card-stack-container .card-thumb.dismiss-right { transform: translateX(200%) rotate(30deg) !important; opacity: 0 !important; }
 
-/* 图片区域 */
-.card-thumb .card-image-wrapper { 
-    flex-grow: 1; 
-    background-color: var(--panel-secondary-color); 
-    position: relative;
+/* 堆叠操作按钮 */
+#stack-actions { display: flex; justify-content: center; gap: 30px; margin-top: 20px; }
+#stack-actions button { 
+    width: 70px; height: 70px; border-radius: 50%; 
+    border: 1px solid var(--border-color); background-color: var(--panel-color); 
+    font-size: 2.5em; cursor: pointer; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.2s; 
+    display: flex; justify-content: center; align-items: center; padding: 0;
 }
-.card-thumb img { 
-    width: 100%; 
-    height: 100%; 
-    object-fit: cover; 
-    pointer-events: none; /* 防止拖拽图片 */
-}
-
-/* 状态类定义 */
-
-/* 1. 当前卡片 (最前面) */
-#card-stack-container .card-thumb.current { 
-    transform: translate3d(0, 0, 0) scale(1); 
-    opacity: 1; 
-    z-index: 10; 
-    pointer-events: auto;
-    filter: brightness(1);
-}
-
-/* 2. 下一张 (中间) */
-#card-stack-container .card-thumb.next { 
-    transform: translate3d(0, 15px, -60px) scale(0.95); /* 用 z轴 代替纯 scale，更真实 */
-    opacity: 0.8; 
-    z-index: 9; 
-    pointer-events: none;
-    filter: brightness(0.7); /* 让后面的卡片变暗，增加层次感 */
-}
-
-/* 3. 下下张 (最后) */
-#card-stack-container .card-thumb.after-next { 
-    transform: translate3d(0, 30px, -120px) scale(0.9); 
-    opacity: 0.6; 
-    z-index: 8; 
-    pointer-events: none;
-    filter: brightness(0.5);
-}
-
-/* 4. 隐藏的卡片 (待机状态) */
-#card-stack-container .card-thumb.hidden { 
-    transform: translate3d(0, 45px, -180px) scale(0.85); 
-    opacity: 0; 
-    z-index: 0; 
-    pointer-events: none; 
-}
-
-/* 5. 飞出动画类 (加入旋转) */
-#card-stack-container .card-thumb.dismiss-left { 
-    transform: translate3d(-120%, 50px, 0) rotate(-25deg) !important; 
-    opacity: 0 !important; 
-}
-#card-stack-container .card-thumb.dismiss-right { 
-    transform: translate3d(120%, 50px, 0) rotate(25deg) !important; 
-    opacity: 0 !important; 
-}
-
-/* 6. 进场动画类 (从后面复位时使用) */
-#card-stack-container .card-thumb.reset-from-back {
-    transition: none !important; /* 关闭动画，瞬间归位 */
-    transform: translate3d(0, 45px, -180px) scale(0.85);
-    opacity: 0;
-}
+#stack-actions button:hover { transform: scale(1.1); }
+#btn-swipe-left, #btn-swipe-right { color: var(--text-secondary-color); }
+#btn-swipe-left:hover, #btn-swipe-right:hover { color: var(--primary-color); transform: scale(1.1); }
 
 /* =========================================
    5. 仪表盘 (Dashboard)
@@ -1842,20 +1780,6 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
     text-overflow: ellipsis;
     font-weight: normal;
 }
-/* =========================================
-   9. 响应式适配 (手机端隐藏按钮)
-   ========================================= */
-   @media (max-width: 768px) {
-    /* 在屏幕宽度小于 768px 时隐藏操作按钮容器 */
-    #stack-actions {
-        display: none !important;
-    }
-
-    /* 可选优化：因为按钮没了，可以调整一下卡片容器的边距，让它在手机上位置更协调 */
-    #card-stack-container {
-        margin-top: 40px;      /* 顶部留出更多空间 */
-    }
-}
 </style>
 </head>
 <body>
@@ -1864,7 +1788,7 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
         <div class="container">
             <!-- 头部：仅包含标题 -->
             <div class="page-header">
-                <h1>档案室</h1>
+                <h1>𝟙𝟡𝟘𝟘</h1>
             </div>
 
             <!-- 操作栏：包含搜索和上传按钮 -->
@@ -1919,7 +1843,7 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
     <!-- 页面二：仪表盘 (新版) -->
     <div id="page-dashboard" class="page">
        <div class="container">
-           <h1>指挥中心</h1> <!-- 标题改得更有感觉一点 -->
+           <h1>⛌⛌⛌ 𝜗𝜚 ⛌⛌⛌</h1> <!-- 标题改得更有感觉一点 -->
         
            <div class="dashboard-grid">
             
@@ -1927,7 +1851,7 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
                <div class="dashboard-panel" style="padding: 0; overflow: hidden;">
                    <div class="panel-header" style="padding: 15px 20px; border-bottom: 1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
                        <h3 id="dashboard-showcase-title" onclick="openShowcaseSelector()" style="margin:0; cursor:pointer; display:flex; align-items:center; gap:8px;">
-                           💖 我的最爱 <span style="font-size:0.7em; opacity:0.5;">▼</span>
+                        𝕮𝖗𝖚𝖘𝖍 𝕭𝖊𝖘𝖙 <span style="font-size:0.7em; opacity:0.5;">▼</span>
                       </h3>
                        <span style="font-size:0.8em; color:var(--text-secondary-color);">点击标题切换</span>
                   </div>
@@ -2805,57 +2729,21 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
         nextBtn.disabled = currentPage === totalPages;
     }
     
-// ==========================================
-    // 优化的卡片堆叠 JS 逻辑
-    // ==========================================
-
-    function initCardStack() { 
-        allCharacterCards = Array.from(document.querySelectorAll('#card-stack-container .card-thumb')); 
-        if(allCharacterCards.length === 0) return;
-        
-        currentCardIndex = 0; 
-        
-        // 初始化时，给予所有卡片基础状态
-        allCharacterCards.forEach(c => c.classList.add('hidden'));
-        updateCardStackUI(); 
-    }
-
+    function initCardStack() { allCharacterCards = Array.from(document.querySelectorAll('#card-stack-container .card-thumb')); currentCardIndex = 0; updateCardStackUI(); }
     function updateCardStackUI() {
         const total = allCharacterCards.length;
         if (total === 0) return;
         
-        // 清除所有定位类，保留 dismiss 类以便动画完成
-        allCharacterCards.forEach(c => {
-            if (!c.classList.contains('dismiss-left') && !c.classList.contains('dismiss-right')) {
-                c.classList.remove('current', 'next', 'after-next', 'hidden');
-            }
-        });
+        allCharacterCards.forEach(c => c.classList.remove('current', 'next', 'after-next', 'dismiss-left', 'dismiss-right'));
         
-        // 计算索引 (循环队列)
+        // 循环模式：计算当前、下一张、下下一张的索引
         const curIndex = currentCardIndex % total;
         const nextIndex = (currentCardIndex + 1) % total;
         const afterNextIndex = (currentCardIndex + 2) % total;
 
-        // 设置当前可见的三张卡片
-        const currentCard = allCharacterCards[curIndex];
-        const nextCard = allCharacterCards[nextIndex];
-        const afterNextCard = allCharacterCards[afterNextIndex];
-
-        // 只有当卡片不在飞出状态时才应用样式
-        if (!currentCard.classList.contains('dismiss-left') && !currentCard.classList.contains('dismiss-right')) {
-            currentCard.classList.add('current');
-            currentCard.classList.remove('hidden');
-        }
-
-        if (total > 1) {
-            nextCard.classList.add('next');
-            nextCard.classList.remove('hidden');
-        }
-        
-        if (total > 2) {
-            afterNextCard.classList.add('after-next');
-            afterNextCard.classList.remove('hidden');
-        }
+        allCharacterCards[curIndex].classList.add('current');
+        if (total > 1) allCharacterCards[nextIndex].classList.add('next');
+        if (total > 2) allCharacterCards[afterNextIndex].classList.add('after-next');
     }
 
     function handleSwipe(direction) {
@@ -2864,77 +2752,26 @@ h3 { margin-top: 0; color: var(--text-secondary-color); font-weight: 600; font-s
         if (total === 0) return;
 
         isAnimating = true;
-        const currentCard = allCharacterCards[currentCardIndex % total];
+        const currentCard = allCharacterCards[currentCardIndex];
         
-        // 1. 当前卡片飞出
+        // 左滑：下一张 (Next)
         if (direction === 'left') {
             currentCard.classList.add('dismiss-left');
-        } else {
+            setTimeout(() => {
+                currentCardIndex = (currentCardIndex + 1) % total;
+                updateCardStackUI();
+                isAnimating = false;
+            }, 500);
+        }
+        // 右滑：上一张 (Prev)
+        else {
             currentCard.classList.add('dismiss-right');
+            setTimeout(() => {
+                currentCardIndex = (currentCardIndex - 1 + total) % total;
+                updateCardStackUI();
+                isAnimating = false;
+            }, 500);
         }
-        
-        // 2. 关键优化：立刻更新索引，让后面的卡片"补位"
-        // 我们不等待当前卡片飞完，而是立刻让 index + 1
-        // 但是，我们需要保持飞出的那张卡片在 DOM 上停留一会儿直到动画结束
-        
-        // 提前计算下一轮的索引
-        const nextIndex = (currentCardIndex + 1) % total;
-        
-        // 获取原本是 next 和 after-next 的卡片，强制它们立刻开始变身
-        const nextCard = allCharacterCards[nextIndex];
-        const afterNextCard = allCharacterCards[(currentCardIndex + 2) % total];
-        
-        // 强制下一张卡片从 .next 变为 .current 样式 (CSS transition 会处理平滑过渡)
-        if(total > 1) {
-             nextCard.classList.remove('next');
-             nextCard.classList.add('current');
-        }
-        
-        // 强制下下张卡片从 .after-next 变为 .next
-        if(total > 2) {
-            afterNextCard.classList.remove('after-next');
-            afterNextCard.classList.add('next');
-        }
-        
-        // 如果有更多卡片，把原本 hidden 的那张拉出来变成 after-next
-        if(total > 3) {
-            const hiddenCard = allCharacterCards[(currentCardIndex + 3) % total];
-            hiddenCard.classList.remove('hidden');
-            
-            // 这是一个小 trick：先立刻瞬移到 hidden 位置，再过渡到 after-next
-            // 避免它从屏幕中间直接飞过来
-            hiddenCard.style.transition = 'none';
-            hiddenCard.classList.add('hidden'); // 确保它在后面
-            
-            // 强制重绘
-            void hiddenCard.offsetWidth; 
-            
-            hiddenCard.style.transition = ''; // 恢复动画
-            hiddenCard.classList.remove('hidden');
-            hiddenCard.classList.add('after-next');
-        }
-
-        // 3. 更新逻辑索引
-        currentCardIndex = (currentCardIndex + 1) % total;
-
-        // 4. 清理工作 (等待动画结束后)
-        setTimeout(() => {
-            // 重置飞出去的那张卡片
-            currentCard.classList.remove('dismiss-left', 'dismiss-right', 'current');
-            currentCard.classList.add('hidden'); // 放回队尾隐藏
-            
-            // 它是循环队列，所以它现在变成了最后一张（或隐藏的那张）
-            // 加上 reset-from-back 类瞬间归位，防止它倒着飞回来
-            currentCard.classList.add('reset-from-back');
-            void currentCard.offsetWidth; // 强制重绘
-            currentCard.classList.remove('reset-from-back');
-
-            isAnimating = false;
-            
-            // 再次调用 UI 更新以确保状态绝对正确（兜底）
-            updateCardStackUI();
-            
-        }, 400); // 时间要匹配 CSS 中的 transition duration (0.4s)
     }
 
     // --- 详情页逻辑 ---
