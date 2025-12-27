@@ -1,6 +1,6 @@
 {
-  "name": "ㅇㅅㅇ",
-  "short_name": "ㅇㅅㅇ",
+  "name": "òᆺó",
+  "short_name": "òᆺó",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#FFFFFF",
@@ -8,27 +8,28 @@
   "description": "一个有趣的网页应用",
   "icons": [
     {
-      "src": "https://i.postimg.cc/GpRN3xrd/천사토끼(3).png",
+      "src": "https://i.postimg.cc/1zsGZ85M/Camera-1040g3k831o3b7f1bkq105oaltnigkev8gp3kia8.jpg",
       "sizes": "125x125",
       "type": "image/png"
     },
     {
-      "src": "https://i.postimg.cc/GpRN3xrd/천사토끼(3).png",
+      "src": "https://i.postimg.cc/1zsGZ85M/Camera-1040g3k831o3b7f1bkq105oaltnigkev8gp3kia8.jpg",
       "sizes": "144x144",
       "type": "image/png"
     },
     {
-      "src": "https://i.postimg.cc/GpRN3xrd/천사토끼(3).png",
+      "src": "https://i.postimg.cc/1zsGZ85M/Camera-1040g3k831o3b7f1bkq105oaltnigkev8gp3kia8.jpg",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://i.postimg.cc/GpRN3xrd/천사토끼(3).png",
+      "src": "https://i.postimg.cc/1zsGZ85M/Camera-1040g3k831o3b7f1bkq105oaltnigkev8gp3kia8.jpg",
       "sizes": "512x512",
       "type": "image/png"
     }
   ]
 
 }
+
 
 
